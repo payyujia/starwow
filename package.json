@@ -1,0 +1,30 @@
+{
+  "name": "starwow",
+  "version": "1.0.0",
+  "description": "All credits to Animoca Games",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/payyujia/starwow.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/payyujia/starwow/issues"
+  },
+  "homepage": "https://github.com/payyujia/starwow#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "ejs": "^5.0.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "path": "^0.12.7",
+    "postgres": "^3.4.9"
+  }
+}
