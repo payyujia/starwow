@@ -1,10 +1,5 @@
 local A = {}
 
--- Safe loader: returns placeholder colored rectangle quad if file missing
--- local function tryImage(path)
---   local ok, img = pcall(love.graphics.newImage, path)
---   return ok and img or nil
--- end
 local function tryImage(path)
   local ok, result = pcall(love.graphics.newImage, path)
   if not ok then
@@ -33,12 +28,12 @@ function A.load()
     coin      = tryImage("assets/images/ui/coin.png"),
     energy    = tryImage("assets/images/ui/energy.png"),
     exp       = tryImage("assets/images/ui/exp.png"),
-    buyBtn    = tryImage("assets/images/ui/pink-button.png"),
     background = tryImage("assets/images/ui/background.png"),
     settings  = tryImage("assets/images/ui/settings.png"),
     lace      = tryImage("assets/images/ui/lace.png"),
     buyBtn    = tryImage("assets/images/ui/pinkbutton.png"),
-    mannequin = tryImage("assets/images/ui/dressup_dummy_stand-hd.png")
+    mannequin = tryImage("assets/images/ui/dressup_dummy_stand-hd.png"),
+    magnify   = tryImage("assets/images/ui/magnify.png")
   }
 
 
