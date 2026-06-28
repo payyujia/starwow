@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chest</title>
+</head>
+
+<body>
+    <h1><%= assets[0].chest %></h1>
+  
+
+    <div class="assets">
+        <% assets.forEach(asset=> { %>
+            <div class="asset-card">
+                <%=asset.assetid%>----<%=asset.rarity%>
+            </div>
+            <% }) %>
+    </div>
+</body>
+
+</html>
