@@ -97,60 +97,63 @@ local function drawRightPanel(sw, sh)
       love.graphics.setScissor(lw - 60, top, rw + 60, sh - top)
     end
 
-    -- ── Chest image
-    -- height = card height, width proportional; left quarter overhangs
-    local chestH  = CARD_HEIGHT
+-- ── Chest image ───────────────────────────────────────────────
+    local chestH   = CARD_HEIGHT
     local chestImg = imgs and imgs.chest
-    local iw, ih  = chestImg:getDimensions()
-    local scale   = chestH / ih
-    chestW        = iw * scale
-    local chestX  = cx -100
+    local iw, ih   = chestImg:getDimensions()
+    local chestX   = cx - 100
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(chestImg, chestX, cy, 0, scale, scale)
-  -- Bopping magnify glass
-  local bopScale = scale * (1 + 0.07* math.sin(menuTime * 3.5))
-  local mgW = A.ui.magnify:getWidth() * bopScale
-  local mgH = A.ui.magnify:getHeight() * bopScale
-  love.graphics.draw(
-    A.ui.magnify,
-    chestX + 25 + mgW/2,   -- offset by half so it scales from center
-    cy + chestH * 0.6 + mgH/2,
-    0,
-    bopScale, bopScale,
-    A.ui.magnify:getWidth()/2,   -- origin x = center of image
-    A.ui.magnify:getHeight()/2   -- origin y = center of image
-  )
-    -- Chest name 
-    local textX = cx + chestW * 0.6  -- starts after the chest image
-    local textW = cw - chestW * 0.6
-    love.graphics.setColor(0.5,0.09,0.65, 1)
-    love.graphics.setFont(A.font.md)
-    love.graphics.printf(chest.name, textX, cy + 50, textW, "center")
+    love.graphics.draw(chestImg, chestX, cy, 0)
 
-    -- Buy button 
-    local btnW, btnH = 380, 240
-    local btnX = cx + chestW * 0.6
-    local btnY = cy + (CARD_HEIGHT - btnH) / 1.3
+    -- Bopping magnify glass
+    local bopScale = 1 + 0.07 * math.sin(menuTime * 3.5)
+    love.graphics.draw(
+      A.ui.magnify,
+      chestX + 25, cy + chestH * 0.7,
+      0, bopScale, bopScale,
+      0, A.ui.magnify:getHeight() / 2
+    )
+
+    -- ── Content region (everything right of chest) ─────────────────
+    local contentX = chestX + iw * 0.75   -- where text+button live
+    local contentW = (cx + cw) - contentX     -- remaining card width
+
+    -- ── Chest name ─────────────────────────────────────────────────
+    love.graphics.setColor(0.5, 0.09, 0.65, 1)
+    love.graphics.setFont(A.font.md)
+    love.graphics.printf(chest.name, contentX, cy + 40, contentW, "center")
+
+    -- ── Buy button ─────────────────────────────────────────────────
+    local btnW   = contentW * 0.7          -- 70% of content region
+    local btnH   = CARD_HEIGHT * 0.6      -- proportional to card height
+    local btnX   = contentX + (contentW - btnW) / 2   -- centered in content
+    local btnY   = cy + CARD_HEIGHT * 0.3           -- sits in lower half
     local canBuy = State.canAfford(chest.price)
 
     love.graphics.setColor(canBuy and {1,1,1,1} or {0.5,0.5,0.5,1})
     drawStretch(A.ui.buyBtn, btnX, btnY, btnW, btnH)
-    -- "Buy"
-    love.graphics.setFont(A.font.lg)
-    love.graphics.printf("Buy", btnX, btnY + btnH/4, btnW, "center")
 
-    local iconSize = A.font.sm:getHeight()   -- matches the smaller font now
+    -- "Buy" text centered in button upper half
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setFont(A.font.md)
+    love.graphics.printf("Buy", btnX, btnY + btnH * 0.25, btnW, "center")
+
+    -- Icon + price centered in button lower half
+    local iconH    = A.font.sm:getHeight()
     local priceStr = tostring(chest.price.amount)
     local iconImg  = (chest.price.currency == "diamonds") and A.ui.diamond or A.ui.coin
-    local lineY    = btnY + btnH * 0.6
-    local totalW   = iconSize + 4 + A.font.sm:getWidth(priceStr)
+    local totalW   = iconH + 4 + A.font.sm:getWidth(priceStr)
     local lineX    = btnX + (btnW - totalW) / 2
+    local lineY    = btnY + btnH * 0.55
 
-    local iw, ih = iconImg:getDimensions()
-    love.graphics.draw(iconImg, lineX, lineY, 0, iconSize/iw, iconSize/ih)
-
+    if iconImg then
+      local iw2, ih2 = iconImg:getDimensions()
+      love.graphics.setColor(1, 1, 1, 1)
+      love.graphics.draw(iconImg, lineX, lineY, 0, iconH/iw2, iconH/ih2)
+    end
     love.graphics.setFont(A.font.sm)
-    love.graphics.print(priceStr, lineX + iconSize + 4, lineY)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.print(priceStr, lineX + iconH + 4, lineY)
 
     ::continue::
   end

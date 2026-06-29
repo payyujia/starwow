@@ -1,12 +1,14 @@
 local A = {}
 
 local function tryImage(path)
-  local ok, result = pcall(love.graphics.newImage, path)
+  local ok, img = pcall(love.graphics.newImage, path, { mipmaps = true })
   if not ok then
-    print("FAILED: " .. path .. " | " .. tostring(result))
+    print("MISSING IMAGE: " .. path)
     return nil
   end
-  return result
+  img:setFilter("linear", "linear")
+  img:setMipmapFilter("linear", 0)  -- 0 = sharpest, increase for softer
+  return img
 end
 
 local function tryFont(path, size)
@@ -33,7 +35,8 @@ function A.load()
     lace      = tryImage("assets/images/ui/lace.png"),
     buyBtn    = tryImage("assets/images/ui/pinkbutton.png"),
     mannequin = tryImage("assets/images/ui/dressup_dummy_stand-hd.png"),
-    magnify   = tryImage("assets/images/ui/magnify.png")
+    magnify   = tryImage("assets/images/ui/magnify.png"),
+    glitter   = tryImage("assets/images/ui/glitter_row.png")
   }
 
 
@@ -50,13 +53,12 @@ function A.load()
   -- Prize sprites keyed by item id
   A.prizes = {}
   for _, chest in ipairs(chestData) do
+    print("chest:", chest.id, "pool size:", chest.pool and #chest.pool or "NIL")
     for _, item in ipairs(chest.pool) do
-      if not A.prizes[item.id] then
-        A.prizes[item.id] = tryImage("assets/images/prizes/" .. item.id .. ".png")
-      end
+      A.prizes[item.id] = tryImage("assets/images/prizes/" .. item.id .. ".png")
     end
   end
-
+  print(A.prizes)
   local ok, src = pcall(love.audio.newSource, "assets/music/bgm.mp3", "stream")
   if ok then A.bgm = src; A.bgm:setLooping(true) end
 end

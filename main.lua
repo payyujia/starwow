@@ -7,6 +7,7 @@ local A      = require("src.assets")
 local State  = require("src.state")
 local Navbar = require("src.navbar")
 local Menu   = require("src.menu")
+local Popup = require("src.popup")
 
 -- ── scene wiring (stubs until you build them) ────────────────────────────────
 local scene = "menu"
@@ -20,16 +21,14 @@ end
 
 local function gotoPopup(chestIndex)
   pendingChest = chestIndex
-  scene = "popup"
-  -- TODO: require("src.popup").open(chestIndex)
+  Popup.open(chestIndex, select(2, love.graphics.getDimensions()))
 end
-
 -- Wire menu callbacks
 Menu.onBuy     = gotoGacha
 Menu.onPreview = gotoPopup
 
 function love.load()
-  love.graphics.setDefaultFilter("linear", "linear")
+  love.graphics.setDefaultFilter("nearest", "nearest",1)
   A.load()
   Menu.load()
   if A.bgm then love.audio.play(A.bgm) end
@@ -37,32 +36,31 @@ end
 
 function love.update(dt)
   local sw, sh = love.graphics.getDimensions()
-  if scene == "menu" then
-    Menu.update(dt, sw, sh)
-  end
+  Menu.update(dt, sw, sh)
+  Popup.update(dt, sw, sh)   -- always update so slide animates out too
 end
 
 function love.draw()
   local sw, sh = love.graphics.getDimensions()
-
-  if scene == "menu" then
-    Menu.draw(sw, sh)
-    Navbar.draw(sw)        -- draws on top
-  end
-
-  -- Debug overlay (remove when done)
-  love.graphics.setColor(0.4, 1, 0.6, 0.6)
-  love.graphics.setFont(A.font.sm)
-  love.graphics.print("scene:" .. scene .. "  fps:" .. love.timer.getFPS(), 4, sh - 16)
-  love.graphics.setColor(1,1,1,1)
+  Menu.draw(sw, sh)
+  Navbar.draw(sw)
+  Popup.draw(sw, sh)          -- draws on top of everything
 end
 
 function love.wheelmoved(x, y)
-  if scene == "menu" then Menu.wheelmoved(x, y) end
+  if Popup.isVisible() then
+    Popup.wheelmoved(x, y)    -- popup consumes scroll when open
+  elseif scene == "menu" then
+    Menu.wheelmoved(x, y)
+  end
 end
 
 function love.mousepressed(mx, my, button)
   local sw, sh = love.graphics.getDimensions()
+  if Popup.isVisible() then
+    Popup.mousepressed(mx, my, button, sw, sh)
+    return                    -- menu doesn't receive clicks while popup open
+  end
   if scene == "menu" then
     Menu.mousepressed(mx, my, button, sw, sh)
   end
