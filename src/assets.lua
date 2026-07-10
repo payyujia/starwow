@@ -1,13 +1,15 @@
 local A = {}
 
-local function tryImage(path)
-  local ok, img = pcall(love.graphics.newImage, path, { mipmaps = true })
+local function tryImage(path, filterMode)
+  local ok, img = pcall(love.graphics.newImage, path)
   if not ok then
     print("MISSING IMAGE: " .. path)
     return nil
   end
-  img:setFilter("linear", "linear")
-  img:setMipmapFilter("linear", 0)  -- 0 = sharpest, increase for softer
+
+  filterMode = filterMode or "linear"
+  img:setFilter(filterMode, filterMode)
+
   return img
 end
 
@@ -18,7 +20,7 @@ end
 
 function A.load()
   A.font = {
-    sm  = tryFont("assets/fonts/main.ttf", 25),
+    sm  = tryFont("assets/fonts/main.ttf", 28),
     md  = tryFont("assets/fonts/main.ttf", 40),
     lg  = tryFont("assets/fonts/main.ttf", 50),
     xl  = tryFont("assets/fonts/main.ttf", 100),
@@ -26,17 +28,22 @@ function A.load()
 
   -- UI / navbar
   A.ui = {
-    diamond   = tryImage("assets/images/ui/diamond.png"),
-    coin      = tryImage("assets/images/ui/coin.png"),
-    energy    = tryImage("assets/images/ui/energy.png"),
-    exp       = tryImage("assets/images/ui/exp.png"),
+    diamond   = tryImage("assets/images/ui/diamond2.png"),
+    coin      = tryImage("assets/images/ui/coin2.png"),
+    energy    = tryImage("assets/images/ui/energy2.png"),
+    exp       = tryImage("assets/images/ui/exp2.png"),
     background = tryImage("assets/images/ui/background.png"),
     settings  = tryImage("assets/images/ui/settings.png"),
     lace      = tryImage("assets/images/ui/lace.png"),
     buyBtn    = tryImage("assets/images/ui/pinkbutton.png"),
     mannequin = tryImage("assets/images/ui/dressup_dummy_stand-hd.png"),
     magnify   = tryImage("assets/images/ui/magnify.png"),
-    glitter   = tryImage("assets/images/ui/glitter_row.png")
+    glitter   = tryImage("assets/images/ui/glitter_row.png"),
+    spotlight = tryImage("assets/images/ui/spotlight.png"),
+    ribbon = tryImage("assets/images/ui/tag_name_bg-hd.png"),
+    confetti1 = tryImage("assets/images/ui/confetti1.png"),
+    confetti2 = tryImage("assets/images/ui/confetti2.png"),
+    radial = tryImage("assets/images/ui/radial.png")
   }
 
 
@@ -55,7 +62,7 @@ function A.load()
   for _, chest in ipairs(chestData) do
     print("chest:", chest.id, "pool size:", chest.pool and #chest.pool or "NIL")
     for _, item in ipairs(chest.pool) do
-      A.prizes[item.id] = tryImage("assets/images/prizes/" .. item.id .. ".png")
+      A.prizes[item.id] = tryImage("assets/images/prizes/" .. item.id .. ".png","nearest")
     end
   end
   print(A.prizes)

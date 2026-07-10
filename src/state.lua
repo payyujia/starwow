@@ -5,7 +5,7 @@ State.player = {
   energy   = "20/20",
   coins    = 500000,
   diamonds = 50000,
-  owned    = {mariposa=true, rose_maxi=true,rose_tube=true,bejewelled_blue=true, cinderella=true, elsa_crown=true },   -- set of item ids the player owns: { rose_dress = true, ... }
+  owned    = { lei=true,hibiscus_sandals=true, picnic_hat=true, fruit_bonnet=true,feather_skirt=true,chrysanthemum_headband=true, red_cherry_veil=true, fur_crop_jacket=true }
 }
 
 function State.hasItem(id)

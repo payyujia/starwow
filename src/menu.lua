@@ -135,14 +135,14 @@ local function drawRightPanel(sw, sh)
 
     -- "Buy" text centered in button upper half
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.setFont(A.font.md)
+    love.graphics.setFont(A.font.lg)
     love.graphics.printf("Buy", btnX, btnY + btnH * 0.25, btnW, "center")
 
     -- Icon + price centered in button lower half
-    local iconH    = A.font.sm:getHeight()
+    local iconH    = A.font.md:getHeight()
     local priceStr = tostring(chest.price.amount)
     local iconImg  = (chest.price.currency == "diamonds") and A.ui.diamond or A.ui.coin
-    local totalW   = iconH + 4 + A.font.sm:getWidth(priceStr)
+    local totalW   = iconH + 4 + A.font.md:getWidth(priceStr)
     local lineX    = btnX + (btnW - totalW) / 2
     local lineY    = btnY + btnH * 0.55
 
@@ -206,7 +206,6 @@ function Menu.mousepressed(mx, my, button, sw, sh)
 
     selectedChest = i
 
-    -- Derive chestW the same way drawRightPanel does
     local imgs    = A.chests[chest.id]
     local chestX  = cx - 100
     local chestW  = 0

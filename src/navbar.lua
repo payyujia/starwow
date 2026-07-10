@@ -45,13 +45,13 @@ function Navbar.draw(sw)
   
     local iw, ih = icon:getDimensions()
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(icon, iconX, iconY, 0, iconSize/iw, iconSize/ih)
+    love.graphics.draw(icon, iconX, iconY, 0)
   
 
     -- Value text: pushed right of icon
     love.graphics.setColor(stat.color)
     love.graphics.setFont(A.font.sm)
-    local textX = pillX + iconSize * 0.8   -- starts just right of where icon ends inside pill
+    local textX = pillX + iconSize   -- starts just right of where icon ends inside pill
     local textW = pillW - iconSize * 0.8 - 4
     love.graphics.printf(val, textX, pillY + (pillH - A.font.sm:getHeight()) / 2, textW, "left")
   end

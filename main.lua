@@ -8,17 +8,28 @@ local State  = require("src.state")
 local Navbar = require("src.navbar")
 local Menu   = require("src.menu")
 local Popup = require("src.popup")
+local Gacha = require("src.gacha")
 
--- ── scene wiring (stubs until you build them) ────────────────────────────────
 local scene = "menu"
 local pendingChest = nil   -- chest index for gacha/popup
 
 local function gotoGacha(chestIndex)
-  pendingChest = chestIndex
-  scene = "gacha"
-  -- TODO: require("src.gacha").start(chestIndex)
-end
+  local ok, err = Gacha.start(chestIndex, function(prize)
+    -- fires when the player taps past the "reveal" phase
+    State.addItem(prize.id)
+    pendingChest = nil
+    scene = "menu"          -- or scene = "popup" if you want a dupe/congrats screen
+  end)
 
+  if ok then
+    pendingChest = chestIndex
+    scene = "gacha"
+  else
+    -- err == "insufficient funds" (or "invalid chest")
+    print("Can't open chest: " .. tostring(err))
+    -- TODO: trigger a shake/toast on the chest button instead of print
+  end
+end
 local function gotoPopup(chestIndex)
   pendingChest = chestIndex
   Popup.open(chestIndex, select(2, love.graphics.getDimensions()))
@@ -28,7 +39,7 @@ Menu.onBuy     = gotoGacha
 Menu.onPreview = gotoPopup
 
 function love.load()
-  love.graphics.setDefaultFilter("nearest", "nearest",1)
+  love.graphics.setDefaultFilter("nearest", "nearest")
   A.load()
   Menu.load()
   if A.bgm then love.audio.play(A.bgm) end
@@ -37,7 +48,8 @@ end
 function love.update(dt)
   local sw, sh = love.graphics.getDimensions()
   Menu.update(dt, sw, sh)
-  Popup.update(dt, sw, sh)   -- always update so slide animates out too
+  Popup.update(dt, sw, sh)
+  Gacha.update(dt)
 end
 
 function love.draw()
@@ -45,6 +57,9 @@ function love.draw()
   Menu.draw(sw, sh)
   Navbar.draw(sw)
   Popup.draw(sw, sh)          -- draws on top of everything
+  if scene == "gacha" then
+    Gacha.draw()
+  end
 end
 
 function love.wheelmoved(x, y)

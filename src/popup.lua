@@ -15,9 +15,9 @@ local HEADER_H     = 110
 local COLLECTED_H  = 36
 
 local SECTIONS = {
-  { rarity = "limited", label = "Limited", bg = {1, 0.8, 0.2},    border = {0.95, 0.5, 0.15} },
+  { rarity = "limited", label = "Limited", bg = {1, 0.8, 0.2}, border = {0.95, 0.5, 0.15} },
   { rarity = "special", label = "Special", bg = {1, 0.78, 0.97}, border = {0.62, 0.32, 0.9} },
-  { rarity = "hot",     label = "Hot",     bg = {0.72, 0.88, 1.0},  border = {0.25, 0.6,  0.95} },
+  { rarity = "hot",     label = "Hot",     bg = {0.72, 0.88, 1.0}, border = {0.25, 0.6,  0.95} },
 }
 
 -- State
@@ -128,7 +128,6 @@ local function drawSection(sec, items, x, y, w, scissorY, scissorH)
   if A.ui.lace then
     local lw2, lh2 = A.ui.lace:getDimensions()
     local sx = w / lw2  -- scale to fill full width
-    love.graphics.setScissor(x, math.max(y, scissorY), w, math.min(secH, scissorH))
     love.graphics.setColor(1, 1, 1)
 
     love.graphics.draw(A.ui.lace, x, y, 0, sx, 1)
@@ -138,7 +137,6 @@ local function drawSection(sec, items, x, y, w, scissorY, scissorH)
     else
       love.graphics.draw(A.ui.lace, x + w, y + secH, math.pi, sx, 1)
     end
-    love.graphics.setScissor(0, scissorY, love.graphics.getWidth(), scissorH)
   end
 
   -- Label centered
@@ -190,7 +188,7 @@ function Popup.draw(sw, sh)
   local modalW = math.floor(sw * .7)
   local modalH = math.floor(sh * 0.9)
   local mx_    = math.floor((sw - modalW) / 2)  -- centered horizontally
-  local my     = math.floor(slideY)
+  local my     = math.floor(slideY)-SECTION_PAD
 
   -- Dim the menu behind
   love.graphics.setColor(0, 0, 0, 0.52)
