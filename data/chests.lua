@@ -24,7 +24,9 @@ return {
       { id = "green_frock",  rarity = "hot", label = "Green Dress", weight = 67 },
       { id = "matronly", rarity = "hot", label = "Work wear", weight = 67 },
       { id = "belle_beret", rarity = "hot", label = "Rose Beret", weight = 67 },
+      { id = "ivory_floral", rarity = "hot", label = "Ivory Floral Necklace", weight = 67 },
       { id = "leg_warmer_paws", rarity = "hot", label = "Sequin Leg Warmers", weight = 67 },
+      { id = "snake_skin_boots", rarity = "hot", label = "Snake Burgundy Boots", weight = 67 },
       { id = "orange_hat", rarity = "hot", label = "Orange Bucket Hat", weight = 67 }
     },
   },

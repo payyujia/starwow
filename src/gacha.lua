@@ -5,17 +5,16 @@ local Chests = require("data.chests")
 local Gacha = {}
 
 
-local SWING_DURATION   = 2   -- seconds of spotlight swing / chest bounce-in
-local BURST_DURATION   = 0.7  -- star flash + particle pop-off before reveal settles
-local HEART_DELAY      = 0.8 -- seconds after the star burst fires before hearts follow
-local RADIAL_SPEED     = 0.6   -- radians/sec, constant rotation behind prize
+local SWING_DURATION   = 2
+local BURST_DURATION   = 0.4  -- star flash
+local RADIAL_SPEED     = 0.6   -- light rays behind prize
 local RESTING_ANGLE    = math.rad(-25) -- final spotlight angle, converging \/ on chest
 local SWING_PEAKS      = {
-  { t = 0.00, mul = -4 },  -- /\ 
-  { t = 0.40, mul = 3 },  -- \/
-  { t = 0.80, mul = -3 }, -- /\
-  { t = 1.20, mul = 2 },  -- \/
-  { t = 1.60, mul = 1.0  }, -- \/  final rest at RESTING_ANGLE
+  { t = 0.0, mul = -4 },  -- /\ 
+  { t = 0.4, mul = 3 },  -- \/
+  { t = 0.8, mul = -3 }, -- /\
+  { t = 1.2, mul = 2 },  -- \/
+  { t = 1.6, mul = 1  }, -- \/  final rest at RESTING_ANGLE
 }
  
 local PRIZE_SIZE   = 150
@@ -28,17 +27,16 @@ local RARITY_STYLE = {
 }
 
 local phase       = nil     -- nil until Gacha.start() is called
-local t           = 0       -- phase-local clock
-local burstClock  = 0       -- persists across burst -> reveal, drives one-shot emissions
+local t           = 0
 local starsFired  = false
 local heartsFired = false
-local chest       = nil     -- chest data (from Chests[chestIndex])
-local prize       = nil     -- rolled pool entry {id, rarity, label, weight}
+local chest       = nil
+local prize       = nil
 local sw, sh      = love.graphics.getDimensions()
 local chestCX, chestCY = sw/2, sh/2 + 90
 local radialAngle = 0
 local starPS, heartPS = nil, nil
-local onDone      = nil     -- callback(prize) fired when player taps past reveal
+local onDone      = nil
 
 local function weightedPick(pool)
   local total = 0
@@ -58,8 +56,8 @@ local function buildParticleSystems()
   starPS:setEmissionRate(100)
   starPS:setEmitterLifetime(1)
   starPS:setSpeed(500, 700)
-  starPS:setLinearAcceleration(-800,100, 800, 600)
-  starPS:setLinearDamping(1.8)
+  starPS:setLinearAcceleration(-700,100, 700, 600)
+  starPS:setLinearDamping(2)
   starPS:setSpread(math.pi * 5)
   starPS:setRotation(0, math.pi * 2)
   starPS:setSpin(-6, 6)
@@ -68,14 +66,13 @@ local function buildParticleSystems()
   starPS:setColors(1, 1, 1, 0.4,  1, 1, 1, 0.4,  1, 1, 1, 0)
 
   heartPS = love.graphics.newParticleSystem(A.ui.confetti1, 100)
-  heartPS:setParticleLifetime(2)
+  heartPS:setParticleLifetime(1.6,1.8)
   heartPS:setEmissionRate(0)
-  heartPS:setSpeed(490, 500)
+  heartPS:setSpeed(450, 500)
   heartPS:setLinearDamping(1.7)
   heartPS:setSpread(math.pi * 2)
-  heartPS:setSizes(0.1, 0.12, 0.08)
-  heartPS:setSizeVariation(0.15)
-  heartPS:setColors(1, 0.6, 1, 0.2,  1, 0.6, 1, 0.2,  1, 0.6, 1, 0.1)
+  heartPS:setSizes(0.08, 0.1, 0.08)
+  heartPS:setColors(1, 0.6, 1, 0.3,  1, 0.6, 1, 0.2,  1, 0.6, 1, 0.1)
 end
 
 local function easeOutCubic(x)
@@ -118,7 +115,6 @@ function Gacha.start(chestIndex, doneCallback)
  
   phase = "bounce"
   t = 0
-  burstClock = 0
   starsFired = false
   heartsFired = false
   radialAngle = 0
@@ -154,27 +150,25 @@ function Gacha.update(dt)
     if t >= SWING_DURATION+1 then
       phase = "burst"
       t = 0
-      burstClock = 0
     end
  
   elseif phase == "burst" then
-    burstClock = burstClock + dt
     if not starsFired then
       fireStars()
       starsFired = true
     end
+    updateBurst(dt)
     if t >= BURST_DURATION then
       phase = "reveal"
       t = 0
     end
  
   elseif phase == "reveal" then
-    burstClock = burstClock + dt
-    if not heartsFired and burstClock >= HEART_DELAY then
+    if not heartsFired then
       fireHearts()
       heartsFired = true
     end
-    updateBurst(dt) -- let remaining particles finish drifting/fading
+    updateBurst(dt)
   end
  
   radialAngle = radialAngle + RADIAL_SPEED * dt
@@ -200,7 +194,6 @@ local function drawSpotlights(f)
   -- right spotlight: mirrored, tilts left (-ang) toward chest
   love.graphics.draw(img, chestCX + 400, -20, -ang, 1, 1, iw/2, 0)
   love.graphics.setColor(1,1,1,1)
-  love.graphics.print(f)
 end
 
 local function drawChest(t)
@@ -232,7 +225,7 @@ end
 
 local function drawWhiteFlash(f)
   local img = A.ui.confetti2
-  local progress = math.min(easeOutCubic(f), 1)
+  local progress = math.min(easeOutCubic(f),1)
   local x, y = sw / 2, sh / 2
   local iw, ih = img:getDimensions()
 
@@ -301,12 +294,12 @@ function Gacha.draw()
     local f = math.min(t / BURST_DURATION, 1)
     drawSpotlights(1)
     drawChest(2)
+    drawBurst()
     drawWhiteFlash(f)
   
   elseif phase == "reveal" then
     drawSpotlights(1)
     drawBurst() -- trailing particles still falling/fading
-    drawRadial()
     drawPrizeFramed()
   end
 end
