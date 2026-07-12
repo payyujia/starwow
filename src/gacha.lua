@@ -52,43 +52,40 @@ end
 
 local function buildParticleSystems()
   starPS = love.graphics.newParticleSystem(A.ui.confetti2, 1000)
-  starPS:setParticleLifetime(1.5, 2)
+  starPS:setParticleLifetime(1.3)
   starPS:setEmissionRate(100)
-  starPS:setEmitterLifetime(1)
-  starPS:setSpeed(500, 700)
-  starPS:setLinearAcceleration(-700,100, 700, 600)
-  starPS:setLinearDamping(2)
+  starPS:setEmitterLifetime(0.2)
+  starPS:setSpeed(200,300)
+  starPS:setLinearAcceleration(-400, -10, 400, 400)
+  starPS:setLinearDamping(0.5)
   starPS:setSpread(math.pi * 5)
   starPS:setRotation(0, math.pi * 2)
   starPS:setSpin(-6, 6)
   starPS:setSizes(0.2, 0.15, 0.1)
   starPS:setSizeVariation(1)
-  starPS:setColors(1, 1, 1, 0.4,  1, 1, 1, 0.4,  1, 1, 1, 0)
+  starPS:setColors(1, 1, 1, 1,  1, 1, 1, 0.5,  1, 1, 1, 0.1)
 
   heartPS = love.graphics.newParticleSystem(A.ui.confetti1, 100)
-  heartPS:setParticleLifetime(1.6,1.8)
+  heartPS:setParticleLifetime(2)
   heartPS:setEmissionRate(0)
-  heartPS:setSpeed(450, 500)
-  heartPS:setLinearDamping(1.7)
+  heartPS:setSpeed(550, 600)
+  heartPS:setLinearAcceleration(-70, -10, 70, 400)
+  heartPS:setLinearDamping(1.3)
   heartPS:setSpread(math.pi * 2)
-  heartPS:setSizes(0.08, 0.1, 0.08)
-  heartPS:setColors(1, 0.6, 1, 0.3,  1, 0.6, 1, 0.2,  1, 0.6, 1, 0.1)
-end
-
-local function easeOutCubic(x)
-  return 1 - (1 - x)^3
+  heartPS:setSizes(0.05, 0.07, 0.01)
+  heartPS:setColors(1, 0.7, 1, 0.5,  1, 0.7, 1, 0.5,  1, 0.7, 1, 0.2)
 end
 
 local function fireStars()
   starPS:setPosition(chestCX, sh/2)
   starPS:reset()
-  starPS:emit(250)
+  starPS:emit(150)
 end
  
 local function fireHearts()
   heartPS:setPosition(chestCX, sh/2)
   heartPS:reset()
-  heartPS:emit(50)
+  heartPS:emit(100)
 end
  
 local function updateBurst(dt)
@@ -134,7 +131,7 @@ local function spotlightAngle(f)
     local a, b = SWING_PEAKS[i], SWING_PEAKS[i+1]
     if f >= a.t and f <= b.t then
       local local_f = (f - a.t) / (b.t - a.t)
-      local eased = easeOutCubic(local_f)
+      local eased = 1-(1-local_f)^3 --acc the spotlight as it swings down
       local mul = a.mul + (b.mul - a.mul) * eased
       return RESTING_ANGLE * mul
     end
@@ -202,13 +199,13 @@ local function drawChest(t)
 
   local progress = t / 2
 
-  local wobble = math.sin(t / 0.3 * math.pi)
+  local wobble = math.sin(t / 0.34 * math.pi)
 
   local scaleX = 1.3 - progress*0.3 * wobble
   local scaleY = 1.3 + progress*0.3 * wobble
 
   -- illuminated by spotlight
-  local light = math.abs(math.sin((t or 0) * 2))
+  local light = math.abs(math.sin((t or 0)*1.8))
   love.graphics.setColor(light, light, light)
 
   love.graphics.draw(imgs.chest, chestCX, chestCY, 0,
@@ -225,15 +222,16 @@ end
 
 local function drawWhiteFlash(f)
   local img = A.ui.confetti2
-  local progress = math.min(easeOutCubic(f),1)
+  local progress = math.sin(f)
   local x, y = sw / 2, sh / 2
   local iw, ih = img:getDimensions()
 
-  local scale1 = progress * 6
-  local scale2 = progress * 11
+  local scale1 = progress * 11
+  local scale2 = progress * 14
 
-  love.graphics.setColor(1, 1, 1, 0.6)
+  love.graphics.setColor(1, 1, 1, 0.9)
   love.graphics.draw(img, x, y, 0, scale1, scale1, iw / 2, ih / 2)
+  love.graphics.setColor(1,1,1,0.5)
   love.graphics.draw(img, x, y, 0, scale2, scale2, iw / 2, ih / 2)
   love.graphics.setColor(1, 1, 1, 1)
 end
@@ -293,7 +291,7 @@ function Gacha.draw()
   elseif phase == "burst" then
     local f = math.min(t / BURST_DURATION, 1)
     drawSpotlights(1)
-    drawChest(2)
+    drawChest(3)
     drawBurst()
     drawWhiteFlash(f)
   
