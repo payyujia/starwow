@@ -8,7 +8,7 @@ local Gacha = {}
 local SWING_DURATION   = 2
 local BURST_DURATION   = 0.4  -- star flash
 local RADIAL_SPEED     = 0.6   -- light rays behind prize
-local RESTING_ANGLE    = math.rad(-25) -- final spotlight angle, converging \/ on chest
+local RESTING_ANGLE    = math.rad(-23) -- final spotlight angle, converging \/ on chest
 local SWING_PEAKS      = {
   { t = 0.0, mul = -4 },  -- /\ 
   { t = 0.4, mul = 3 },  -- \/
@@ -185,12 +185,9 @@ local function drawSpotlights(f)
   local iw, ih = img:getDimensions()
 
   -- left spotlight: anchored top-left-ish, tilts right (+ang) toward chest
-  love.graphics.setColor(1, 1, 1, 0.55)
   love.graphics.draw(img, chestCX - 400, -20, ang, 1, 1, iw/2, 0)
-
   -- right spotlight: mirrored, tilts left (-ang) toward chest
   love.graphics.draw(img, chestCX + 400, -20, -ang, 1, 1, iw/2, 0)
-  love.graphics.setColor(1,1,1,1)
 end
 
 local function drawChest(t)
@@ -216,7 +213,6 @@ end
 local function drawRadial()
   local img = A.ui.radial
   local iw, ih = img:getDimensions()
-  love.graphics.setColor(1,1,1,0.9)
   love.graphics.draw(img, sw/2, sh/2, radialAngle, 1, 1, iw/2, ih/2)
 end
 
@@ -227,11 +223,11 @@ local function drawWhiteFlash(f)
   local iw, ih = img:getDimensions()
 
   local scale1 = progress * 11
-  local scale2 = progress * 14
+  local scale2 = progress * 22
 
   love.graphics.setColor(1, 1, 1, 0.9)
   love.graphics.draw(img, x, y, 0, scale1, scale1, iw / 2, ih / 2)
-  love.graphics.setColor(1,1,1,0.5)
+  love.graphics.setColor(1,1,1,0.3)
   love.graphics.draw(img, x, y, 0, scale2, scale2, iw / 2, ih / 2)
   love.graphics.setColor(1, 1, 1, 1)
 end
@@ -242,7 +238,6 @@ local function drawPrizeFramed()
   local y = sh/2 - PRIZE_SIZE/2
 
   drawRadial()
-
   love.graphics.setColor(style.border)
   love.graphics.rectangle("fill", x, y, PRIZE_SIZE, PRIZE_SIZE, 10, 10)
   love.graphics.setColor(1,1,1)
@@ -262,19 +257,16 @@ local function drawPrizeFramed()
   end
   love.graphics.setColor(1,1,1,1)
 
-  -- ribbon beneath, original size, rarity label in A.font.lg
   local ribbon = A.ui.ribbon
-  if ribbon then
-    local rw, rh = ribbon:getDimensions()
-    local rx, ry = chestCX, y + PRIZE_SIZE + rh/2 + 6
+    local rw, rh =   ribbon:getDimensions()
+    local rx, ry = chestCX, y + PRIZE_SIZE + rh/2
     love.graphics.draw(ribbon, rx, ry, 0, 1, 1, rw/2, rh/2)
 
     love.graphics.setFont(A.font.lg)
     love.graphics.setColor(1,1,1,1)
     local label = style.label
     local tw = A.font.lg:getWidth(label)
-    love.graphics.print(label, rx - tw/2, ry - A.font.lg:getHeight()/2)
-  end
+    love.graphics.print(label, rx - tw/2, ry - A.font.lg:getHeight())
 end
 
 function Gacha.draw()

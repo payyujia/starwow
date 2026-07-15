@@ -32,7 +32,7 @@ function A.load()
     coin      = tryImage("assets/images/ui/coin2.png"),
     energy    = tryImage("assets/images/ui/energy2.png"),
     exp       = tryImage("assets/images/ui/exp2.png"),
-    background = tryImage("assets/images/ui/background.png"),
+    background= tryImage("assets/images/ui/background.png"),
     settings  = tryImage("assets/images/ui/settings.png"),
     lace      = tryImage("assets/images/ui/lace.png"),
     buyBtn    = tryImage("assets/images/ui/pinkbutton.png"),
@@ -40,10 +40,11 @@ function A.load()
     magnify   = tryImage("assets/images/ui/magnify.png"),
     glitter   = tryImage("assets/images/ui/glitter_row.png"),
     spotlight = tryImage("assets/images/ui/spotlight.png"),
-    ribbon = tryImage("assets/images/ui/tag_name_bg-hd.png"),
+    ribbon    = tryImage("assets/images/ui/banner.png"),
     confetti1 = tryImage("assets/images/ui/confetti1.png"),
     confetti2 = tryImage("assets/images/ui/confetti2.png"),
-    radial = tryImage("assets/images/ui/radial.png")
+    radial    = tryImage("assets/images/ui/radial.png"),
+    container = tryImage("assets/images/ui/container.png")
   }
 
 

@@ -9,7 +9,7 @@ local SLIDE_SPEED  = 10
 local PRIZE_SIZE   = 150
 local PRIZE_PAD    = 12
 local PRIZE_BORDER = 10
-local SECTION_PAD  = 16
+local SECTION_PAD  = 47
 local CORNER       = 16
 local HEADER_H     = 110
 local COLLECTED_H  = 36
@@ -140,9 +140,9 @@ local function drawSection(sec, items, x, y, w, scissorY, scissorH)
   end
 
   -- Label centered
-  love.graphics.setColor(0.42, 0.05, 0.45, 1)
+  love.graphics.setColor(0.66, 0.21, 0.57, 1)
   love.graphics.setFont(A.font.md)
-  love.graphics.printf(sec.label, x, y + SECTION_PAD, w, "center")
+  love.graphics.printf(sec.label, x, y+PRIZE_PAD , w, "center")
 
   local gridW  = cols * (PRIZE_SIZE + PRIZE_PAD) - PRIZE_PAD
   local gridX  = x + (w - gridW) / 2
@@ -185,22 +185,17 @@ end
 function Popup.draw(sw, sh)
   if not visible then return end
 
-  local modalW = math.floor(sw * .7)
+  local modalW = math.floor(sw * .75)
   local modalH = math.floor(sh * 0.9)
   local mx_    = math.floor((sw - modalW) / 2)  -- centered horizontally
-  local my     = math.floor(slideY)-SECTION_PAD
+  local my     = math.floor(slideY)-PRIZE_PAD
 
   -- Dim the menu behind
   love.graphics.setColor(0, 0, 0, 0.52)
   love.graphics.rectangle("fill", 0, 0, sw, sh)
 
   -- Modal background
-  if A.ui.prizecontainer then
-    drawStretch(A.ui.prizecontainer, mx_, my, modalW, modalH)
-  else
-    love.graphics.setColor(0.97, 0.93, 0.99, 1)
-    love.graphics.rectangle("fill", mx_, my, modalW, modalH, 20, 20)
-  end -- DELETE ltr ─────────────────────────────────────────────────────────
+    drawStretch(A.ui.container, mx_+PRIZE_PAD, my, modalW, modalH)
 
   local chest = getChest()
   local imgs  = A.chests[chest.id]
@@ -217,7 +212,7 @@ function Popup.draw(sw, sh)
   end
 
   -- Chest name
-  love.graphics.setColor(0.3, 0.05, 0.4, 1)
+  love.graphics.setColor(1, 1,1, 1)
   love.graphics.setFont(A.font.lg)
   love.graphics.printf(
     chest.name,
@@ -227,16 +222,16 @@ function Popup.draw(sw, sh)
   -- Collected count
   local owned = countOwned(chest.pool)
   local total = #chest.pool
-  love.graphics.setColor(0.45, 0.3, 0.55, 1)
+  love.graphics.setColor(0.66, 0.21, 0.57, 0.6)
   love.graphics.setFont(A.font.sm)
   love.graphics.printf(
     owned .. "/" .. total .. " Collected",
-    mx_, my + HEADER_H + 10,
-    modalW - 16, "right")
+    mx_-SECTION_PAD, my + HEADER_H + 10,
+    modalW, "right")
 
   -- Scrollable prize list
   local listTop  = my + HEADER_H + COLLECTED_H
-  local listH    = modalH - HEADER_H - COLLECTED_H
+  local listH    = modalH - HEADER_H - COLLECTED_H- SECTION_PAD
   local contentX = mx_ + SECTION_PAD
   local contentW = modalW - SECTION_PAD*2
   local drawY    = listTop - popScrollY + SECTION_PAD
