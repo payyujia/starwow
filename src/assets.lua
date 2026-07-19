@@ -44,7 +44,8 @@ function A.load()
     confetti1 = tryImage("assets/images/ui/confetti1.png"),
     confetti2 = tryImage("assets/images/ui/confetti2.png"),
     radial    = tryImage("assets/images/ui/radial.png"),
-    container = tryImage("assets/images/ui/container.png")
+    container = tryImage("assets/images/ui/container.png"),
+    cancel    = tryImage("assets/images/ui/cancel.png")
   }
 
 

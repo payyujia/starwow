@@ -19,6 +19,9 @@ local function gotoGacha(chestIndex)
     State.addItem(prize.id)
     pendingChest = nil
     scene = "menu"          -- or scene = "popup" if you want a dupe/congrats screen
+  end, function()
+    pendingChest = nil
+    scene = "menu"
   end)
 
   if ok then
@@ -76,7 +79,9 @@ function love.mousepressed(mx, my, button)
     Popup.mousepressed(mx, my, button, sw, sh)
     return                    -- menu doesn't receive clicks while popup open
   end
-  if scene == "menu" then
+  if scene == "gacha" then
+    Gacha.mousepressed(mx, my, button)
+  elseif scene == "menu" then
     Menu.mousepressed(mx, my, button, sw, sh)
   end
 end

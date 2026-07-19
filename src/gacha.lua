@@ -37,6 +37,7 @@ local chestCX, chestCY = sw/2, sh/2 + 90
 local radialAngle = 0
 local starPS, heartPS = nil, nil
 local onDone      = nil
+local onExit      = nil
 
 local function weightedPick(pool)
   local total = 0
@@ -99,7 +100,7 @@ local function drawBurst()
 end
  
 
-function Gacha.start(chestIndex, doneCallback)
+function Gacha.start(chestIndex, doneCallback, exitCallback)
   chest = Chests[chestIndex]
   if not chest then return false, "invalid chest" end
  
@@ -116,6 +117,7 @@ function Gacha.start(chestIndex, doneCallback)
   heartsFired = false
   radialAngle = 0
   onDone = doneCallback
+  onExit = exitCallback
  
   if not starPS then buildParticleSystems() end
  
@@ -174,9 +176,39 @@ end
 function Gacha.tap()
   if phase == "reveal" and t > 0.15 then -- small guard vs. the tap that opened it
     local p = prize
+    local done = onDone
     phase = nil
-    if onDone then onDone(p) end
+    onDone = nil
+    onExit = nil
+    if done then done(p) end
   end
+end
+
+function Gacha.exit()
+  if not phase then return false end
+
+  local exitCb = onExit
+  phase = nil
+  prize = nil
+  chest = nil
+  onDone = nil
+  onExit = nil
+
+  if exitCb then exitCb() end
+  return true
+end
+
+function Gacha.mousepressed(mx, my, button)
+  if button ~= 1 then return end
+  if phase ~= "reveal" then return end
+
+  local bx, by, bw, bh = sw - 72, 24, 48, 48
+  if mx >= bx and mx <= bx + bw and my >= by and my <= by + bh then
+    Gacha.exit()
+    return
+  end
+
+  Gacha.tap()
 end
 
 local function drawSpotlights(f)
@@ -225,11 +257,15 @@ local function drawWhiteFlash(f)
   local scale1 = progress * 11
   local scale2 = progress * 22
 
-  love.graphics.setColor(1, 1, 1, 0.9)
+  love.graphics.setColor(1, 1, 1, 0.3)
   love.graphics.draw(img, x, y, 0, scale1, scale1, iw / 2, ih / 2)
-  love.graphics.setColor(1,1,1,0.3)
+  love.graphics.setColor(1,1,1,0.7)
   love.graphics.draw(img, x, y, 0, scale2, scale2, iw / 2, ih / 2)
   love.graphics.setColor(1, 1, 1, 1)
+end
+
+local function drawExitButton()
+  love.graphics.draw(A. ui.cancel,sw - 120 ,20)
 end
 
 local function drawPrizeFramed()
@@ -290,6 +326,7 @@ function Gacha.draw()
   elseif phase == "reveal" then
     drawSpotlights(1)
     drawBurst() -- trailing particles still falling/fading
+    drawExitButton()
     drawPrizeFramed()
   end
 end
