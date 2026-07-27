@@ -132,7 +132,6 @@ local function drawRightPanel(sw, sh)
 
     love.graphics.setColor(canBuy and {1,1,1,1} or {0.5,0.5,0.5,1})
     drawStretch(A.ui.buyBtn, btnX, btnY, btnW, btnH)
-
     -- "Buy" text centered in button upper half
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.setFont(A.font.lg)

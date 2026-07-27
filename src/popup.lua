@@ -22,6 +22,7 @@ local SECTIONS = {
 
 -- State
 local visible    = false
+local closing    = false
 local chestIndex = 1
 local slideY     = 0
 local targetY    = 0
@@ -76,12 +77,15 @@ end
 function Popup.open(idx, sh)
   chestIndex = idx
   visible    = true
+  closing    = false
   popScrollY = 0
   slideY     = sh * 0.9   -- start off-screen below
 end
 
-function Popup.close()
-  visible = false
+function Popup.close(sh)
+  if not visible then return end
+  closing = true
+  targetY = sh + math.max(sh * 0.2, 100)
 end
 
 function Popup.isVisible()
@@ -171,8 +175,16 @@ function Popup.update(dt, sw, sh)
 
   local modalW  = math.floor(sw * .7)
   local modalH  = math.floor(sh * 0.9)
-  targetY       = sh - modalH
+  targetY       = closing and (sh + modalH + PRIZE_PAD) or (sh - modalH)
   slideY        = slideY + (targetY - slideY) * math.min(1, dt * SLIDE_SPEED)
+
+  if closing and slideY >= targetY - 1 then
+    visible = false
+    closing = false
+    slideY = 0
+    popScrollY = 0
+    return
+  end
 
   local chest    = getChest()
   local contentW = modalW - SECTION_PAD * 2
@@ -218,7 +230,8 @@ function Popup.draw(sw, sh)
     chest.name,
     HEADER_H + 10, headerY + (HEADER_H - A.font.lg:getHeight()) / 2,
     sw - HEADER_H - 70, "center")
-
+  -- close button
+  love.graphics.draw(A.ui.cancel,sw-mx_-SECTION_PAD,my-COLLECTED_H)
   -- Collected count
   local owned = countOwned(chest.pool)
   local total = #chest.pool
@@ -264,7 +277,7 @@ function Popup.mousepressed(mx, my_coord, button, sw, sh)
   -- Tap outside modal = close
   local mx_ = math.floor((sw - modalW) / 2)
   if mx < mx_ or mx > mx_ + modalW or my_coord < my_modal then
-    Popup.close()
+    Popup.close(sh)
     return true
   end
 

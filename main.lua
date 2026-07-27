@@ -18,7 +18,7 @@ local function gotoGacha(chestIndex)
     -- fires when the player taps past the "reveal" phase
     State.addItem(prize.id)
     pendingChest = nil
-    scene = "menu"          -- or scene = "popup" if you want a dupe/congrats screen
+    scene = "menu"          -- cont with dupe scene 
   end, function()
     pendingChest = nil
     scene = "menu"
